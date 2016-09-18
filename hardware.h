@@ -30,7 +30,7 @@ const int* get_wsd();
 
 /* 功能：获取光照强度
  * 返回：光照强度数值 */
-float get_brighness();
+float get_brightness();
 
 /* 功能：设置电机转速
  * s：转速

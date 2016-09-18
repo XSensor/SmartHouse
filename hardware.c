@@ -103,9 +103,13 @@ float get_brightness() {
         return 1;
     }
     val=0x01;
-    write(fd,&val,1);
+   if(write(fd,&val,1)<0){
+        return 1;
+   }
     val=0x10;
-    write(fd,&val,1);
+    if(write(fd,&val,1)<0){
+            return 1;
+    }
 
     if(read(fd,&buf,3)) {
         flight=(buf[0]*256+buf[1])/1.2;

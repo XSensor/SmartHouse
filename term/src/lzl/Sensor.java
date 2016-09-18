@@ -16,7 +16,7 @@ public class Sensor {
     // 获取温湿度
     public native String get_humiture();
     // 获取光照强度
-    public native float get_brightness();
+    public native String get_brightness();
     // 设置灯光颜色
     public native void setLight(String color);
     public String getLight() { return color; }

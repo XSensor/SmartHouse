@@ -1,4 +1,4 @@
-#include "lzl_Sensor.h"
+#include "term/src/lzl_Sensor.h"
 #include "hardware.h"
 
 JNIEXPORT void JNICALL Java_lzl_Sensor_init(JNIEnv *env, jobject obj){
@@ -14,13 +14,17 @@ JNIEXPORT jstring JNICALL Java_lzl_Sensor_get_1humiture
     temp[len] = ',';
     sprintf(temp+len+1, "%d.%d", data[0], data[1]);
     jstring str = (*env)->NewStringUTF(env, temp);
-    puts("return");
     return str;
 }
 
-JNIEXPORT jfloat JNICALL Java_lzl_Sensor_get_1brightness
+JNIEXPORT jstring JNICALL Java_lzl_Sensor_get_1brightness
   (JNIEnv *env, jobject obj) {
-    return (jfloat)get_brightness();
+    char temp[100];
+    float b = get_brightness();
+    //printf("bright: %g\n", b);
+    sprintf(temp, "%g", b);
+    jstring str = (*env)->NewStringUTF(env, temp);
+    return str;
 }
 
 /*
