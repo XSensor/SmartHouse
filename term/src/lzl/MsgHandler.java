@@ -5,7 +5,6 @@ import org.json.JSONArray;
 
 import org.json.JSONException;
 
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -20,10 +19,10 @@ class MyTask extends TimerTask {
     @Override
     public void run() {
         Sensor s = Main.sensor;
-        String color = s.getLight();
+        String color = s.get_light();
         String[] humiture = s.get_humiture().split(",");
-        Integer speed = s.getSpeed();
-        Float bright = s.get_brightness();
+        Integer speed = s.get_speed();
+        String bright = s.get_brightness();
 
         ws.send(G.msg("alldata", color, humiture[0], humiture[1], speed, bright));
     }
@@ -184,20 +183,20 @@ class Text2Json {
  * Created by tom on 16-8-16.
  */
 public class MsgHandler {
-    static Timer timer = new Timer();
-    static MyTask task = null;
+    static Timer timer = null;
     static Text2Json t2j = new Text2Json();
 
     // 自动向app发送传感器数据
     void openauto(WebSocket ws, JSONArray data) {
-        if (task == null) {
-            task = new MyTask(ws);
+        if (timer == null) {
+            timer = new Timer();
+            timer.schedule(new MyTask(ws), 0, 1500);
         }
-        timer.schedule(task, 0, 1500);
     }
     // 关闭自动发送
     void closeauto(WebSocket ws, JSONArray data) {
         timer.cancel();
+        timer = null;
     }
     // 消息回显，app发送什么就返回什么
     void echo(WebSocket ws, JSONArray data) {
@@ -211,29 +210,29 @@ public class MsgHandler {
     }
     //
     void getspeed(WebSocket ws, JSONArray data) {
-        ws.send(G.msg("speed", Main.sensor.getSpeed()));
+        ws.send(G.msg("speed", Main.sensor.get_speed()));
     }
     void getlight(WebSocket ws, JSONArray data) {
-        ws.send(G.msg("light", Main.sensor.getLight()));
+        ws.send(G.msg("light", Main.sensor.get_light()));
     }
     void setspeed(WebSocket ws, JSONArray data) {
         try {
-            Main.sensor.setSpeed(data.getInt(1));
+            Main.sensor.set_speed(data.getInt(1));
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
     void JiaSu(WebSocket ws, JSONArray data) {
-        int speed = Main.sensor.getSpeed() + 20;
-        Main.sensor.setSpeed(speed > 100 ? 100 : speed);
+        int speed = Main.sensor.get_speed() + 20;
+        Main.sensor.set_speed(speed > 100 ? 100 : speed);
     }
     void JianSu(WebSocket ws, JSONArray data) {
-        int speed = Main.sensor.getSpeed() - 20;
-        Main.sensor.setSpeed(speed < 0 ? 0 : speed);
+        int speed = Main.sensor.get_speed() - 20;
+        Main.sensor.set_speed(speed < 0 ? 0 : speed);
     }
     void setlight(WebSocket ws, JSONArray data) {
         try {
-            Main.sensor.setLight(data.getString(1));
+            Main.sensor.set_light(data.getString(1));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -271,5 +270,6 @@ public class MsgHandler {
     // App端已经下线
     void APPOFF(WebSocket ws, JSONArray data) {
         timer.cancel();
+        timer = null;
     }
 }
